@@ -6,15 +6,17 @@ import 'package:analysis_server/lsp_protocol/protocol.dart' hide Element;
 import 'package:analysis_server/src/lsp/error_or.dart';
 import 'package:analysis_server/src/lsp/handlers/handlers.dart';
 import 'package:analysis_server/src/lsp/mapping.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/src/dart/ast/utilities.dart';
 import 'package:meta/meta.dart';
 
 /// A common base for commands that accept a position in a document and return
 /// a location to navigate to a particular kind of related element, such as
 /// Super, Augmentation Target or Augmentation.
-abstract class AbstractGoToHandler
-    extends SharedMessageHandler<TextDocumentPositionParams, Location?> {
+abstract class AbstractGoToHandler extends SharedMessageHandler<
+    TextDocumentPositionParams, Either2<Location, List<Location>>?> {
   AbstractGoToHandler(super.server);
 
   @override
@@ -22,11 +24,13 @@ abstract class AbstractGoToHandler
       TextDocumentPositionParams.jsonHandler;
 
   @protected
-  Element? findRelatedElement(Element element);
+  List<Element> findRelatedElements(Element element, CompilationUnit unit);
 
   @override
-  Future<ErrorOr<Location?>> handle(TextDocumentPositionParams params,
-      MessageInfo message, CancellationToken token) async {
+  Future<ErrorOr<Either2<Location, List<Location>>?>> handle(
+      TextDocumentPositionParams params,
+      MessageInfo message,
+      CancellationToken token) async {
     if (!isDartDocument(params.textDocument)) {
       return success(null);
     }
@@ -54,26 +58,56 @@ abstract class AbstractGoToHandler
         return success(null);
       }
 
-      var targetElement = findRelatedElement(element)?.nonSynthetic;
-      var sourcePath = targetElement?.declaration?.source?.fullName;
+      var targetElements =
+          findRelatedElements(element, unit.unit).map((e) => e.nonSynthetic);
 
-      if (targetElement == null || sourcePath == null) {
+      if (targetElements.isEmpty) {
         return success(null);
       }
 
-      var locationLineInfo = server.getLineInfo(sourcePath);
-      if (locationLineInfo == null) {
+      var sourcePaths =
+          targetElements.map((e) => (e, e.declaration?.source?.fullName));
+
+      var nonNullPaths = sourcePaths.whereType<(Element, String)>();
+      if (nonNullPaths.isEmpty) {
         return success(null);
       }
 
-      return success(Location(
-        uri: uriConverter.toClientUri(sourcePath),
-        range: toRange(
-          locationLineInfo,
-          targetElement.nameOffset,
-          targetElement.nameLength,
+      var locationsLineInfo = nonNullPaths.map(
+        (r) => (r.$1, r.$2, server.getLineInfo(r.$2)),
+      );
+
+      var records = locationsLineInfo.whereType<(Element, String, LineInfo)>();
+
+      if (records.isEmpty) {
+        return success(null);
+      }
+
+      if (records case List(length: 1, first: var r)) {
+        return success(Either2.t1(
+          Location(
+            uri: uriConverter.toClientUri(r.$2),
+            range: toRange(
+              r.$3,
+              r.$1.nameOffset,
+              r.$1.nameLength,
+            ),
+          ),
+        ));
+      }
+
+      return success(Either2.t2([
+        ...records.map(
+          (r) => Location(
+            uri: uriConverter.toClientUri(r.$2),
+            range: toRange(
+              r.$3,
+              r.$1.nameOffset,
+              r.$1.nameLength,
+            ),
+          ),
         ),
-      ));
+      ]));
     });
   }
 }
