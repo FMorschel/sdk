@@ -19,9 +19,7 @@ class AugmentationHandler extends AbstractGoToHandler {
   bool get requiresTrustedCaller => false;
 
   @override
-  List<Element> findRelatedElements(Element element, CompilationUnit unit) {
-    return [
-      ...[element.augmentation].nonNulls
-    ];
+  Iterable<Element> findRelatedElements(Element element, CompilationUnit unit) {
+    return [element.augmentation].nonNulls;
   }
 }

@@ -18,16 +18,14 @@ class AugmentedHandler extends AbstractGoToHandler {
   bool get requiresTrustedCaller => false;
 
   @override
-  List<Element> findRelatedElements(Element element, CompilationUnit unit) {
+  Iterable<Element> findRelatedElements(Element element, CompilationUnit unit) {
     return [
-      ...[
-        switch (element) {
-          ExecutableElement element => element.augmentationTarget,
-          InstanceElement element => element.augmentationTarget,
-          PropertyInducingElement element => element.augmentationTarget,
-          _ => null,
-        }
-      ].nonNulls
-    ];
+      switch (element) {
+        ExecutableElement element => element.augmentationTarget,
+        InstanceElement element => element.augmentationTarget,
+        PropertyInducingElement element => element.augmentationTarget,
+        _ => null,
+      }
+    ].nonNulls;
   }
 }

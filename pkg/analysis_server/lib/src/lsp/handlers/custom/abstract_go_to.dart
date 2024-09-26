@@ -24,7 +24,7 @@ abstract class AbstractGoToHandler extends SharedMessageHandler<
       TextDocumentPositionParams.jsonHandler;
 
   @protected
-  List<Element> findRelatedElements(Element element, CompilationUnit unit);
+  Iterable<Element> findRelatedElements(Element element, CompilationUnit unit);
 
   @override
   Future<ErrorOr<Either2<Location, List<Location>>?>> handle(
@@ -65,19 +65,26 @@ abstract class AbstractGoToHandler extends SharedMessageHandler<
         return success(null);
       }
 
-      var sourcePaths =
-          targetElements.map((e) => (e, e.declaration?.source?.fullName));
+      var sourcePaths = targetElements.map(
+        (e) => (element: e, path: e.declaration?.source?.fullName),
+      );
 
-      var nonNullPaths = sourcePaths.whereType<(Element, String)>();
+      var nonNullPaths =
+          sourcePaths.whereType<({Element element, String path})>();
       if (nonNullPaths.isEmpty) {
         return success(null);
       }
 
       var locationsLineInfo = nonNullPaths.map(
-        (r) => (r.$1, r.$2, server.getLineInfo(r.$2)),
+        (r) => (
+          element: r.element,
+          lineInfo: server.getLineInfo(r.path),
+          path: r.path,
+        ),
       );
 
-      var records = locationsLineInfo.whereType<(Element, String, LineInfo)>();
+      var records = locationsLineInfo
+          .whereType<({Element element, LineInfo lineInfo, String path})>();
 
       if (records.isEmpty) {
         return success(null);
@@ -86,11 +93,11 @@ abstract class AbstractGoToHandler extends SharedMessageHandler<
       if (records case List(length: 1, first: var r)) {
         return success(Either2.t1(
           Location(
-            uri: uriConverter.toClientUri(r.$2),
+            uri: uriConverter.toClientUri(r.path),
             range: toRange(
-              r.$3,
-              r.$1.nameOffset,
-              r.$1.nameLength,
+              r.lineInfo,
+              r.element.nameOffset,
+              r.element.nameLength,
             ),
           ),
         ));
@@ -99,11 +106,11 @@ abstract class AbstractGoToHandler extends SharedMessageHandler<
       return success(Either2.t2([
         ...records.map(
           (r) => Location(
-            uri: uriConverter.toClientUri(r.$2),
+            uri: uriConverter.toClientUri(r.path),
             range: toRange(
-              r.$3,
-              r.$1.nameOffset,
-              r.$1.nameLength,
+              r.lineInfo,
+              r.element.nameOffset,
+              r.element.nameLength,
             ),
           ),
         ),

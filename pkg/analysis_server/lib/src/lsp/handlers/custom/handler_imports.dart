@@ -1,4 +1,4 @@
-// Copyright (c) 2019, the Dart project authors. Please see the AUTHORS file
+// Copyright (c) 2024, the Dart project authors. Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
@@ -12,13 +12,13 @@ class ImportsHandler extends AbstractGoToHandler {
   ImportsHandler(super.server);
 
   @override
-  Method get handlesMessage => CustomMethods.super_;
+  Method get handlesMessage => CustomMethods.imports;
 
   @override
   bool get requiresTrustedCaller => false;
 
   @override
-  List<Element> findRelatedElements(Element element, CompilationUnit unit) {
+  Iterable<Element> findRelatedElements(Element element, CompilationUnit unit) {
     var imports = [
       ...unit.directives
           .whereType<ImportDirective>()
@@ -28,7 +28,7 @@ class ImportsHandler extends AbstractGoToHandler {
     var elements = <Element>[];
     for (var import in imports) {
       var prefix = import.prefix?.element.name ?? '';
-      if (import.namespace.getPrefixed(prefix, element.name ?? '') != null) {
+      if (import.namespace.getPrefixed(prefix, element.name ?? '') == element) {
         elements.add(import);
       }
     }

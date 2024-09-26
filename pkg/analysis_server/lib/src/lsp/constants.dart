@@ -139,6 +139,7 @@ abstract final class CustomMethods {
   static const publishFlutterOutline =
       Method('dart/textDocument/publishFlutterOutline');
   static const super_ = Method('dart/textDocument/super');
+  static const imports = Method('dart/textDocument/imports');
   static const dartTextDocumentContent = Method('dart/textDocumentContent');
   static const dartTextDocumentContentDidChange =
       Method('dart/textDocumentContentDidChange');

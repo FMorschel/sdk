@@ -21,10 +21,8 @@ class SuperHandler extends AbstractGoToHandler {
   bool get requiresTrustedCaller => false;
 
   @override
-  List<Element> findRelatedElements(Element element, CompilationUnit unit) {
-    return [
-      ...[_SuperComputer().computeSuper(element)].nonNulls
-    ];
+  Iterable<Element> findRelatedElements(Element element, CompilationUnit unit) {
+    return [_SuperComputer().computeSuper(element)].nonNulls;
   }
 }
 

@@ -12,6 +12,7 @@ import 'package:analysis_server/src/lsp/handlers/custom/handler_augmentation.dar
 import 'package:analysis_server/src/lsp/handlers/custom/handler_augmented.dart';
 import 'package:analysis_server/src/lsp/handlers/custom/handler_connect_to_dtd.dart';
 import 'package:analysis_server/src/lsp/handlers/custom/handler_diagnostic_server.dart';
+import 'package:analysis_server/src/lsp/handlers/custom/handler_imports.dart';
 import 'package:analysis_server/src/lsp/handlers/custom/handler_reanalyze.dart';
 import 'package:analysis_server/src/lsp/handlers/custom/handler_super.dart';
 import 'package:analysis_server/src/lsp/handlers/handler_call_hierarchy.dart';
@@ -129,6 +130,7 @@ class InitializedStateMessageHandler extends ServerStateMessageHandler {
     FormatRangeHandler.new,
     FormattingHandler.new,
     HoverHandler.new,
+    ImportsHandler.new,
     ImplementationHandler.new,
     IncomingCallHierarchyHandler.new,
     OutgoingCallHierarchyHandler.new,
