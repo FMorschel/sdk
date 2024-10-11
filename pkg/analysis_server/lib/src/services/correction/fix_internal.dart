@@ -170,6 +170,7 @@ import 'package:analysis_server/src/services/correction/dart/remove_type_argumen
 import 'package:analysis_server/src/services/correction/dart/remove_unexpected_underscores.dart';
 import 'package:analysis_server/src/services/correction/dart/remove_unnecessary_cast.dart';
 import 'package:analysis_server/src/services/correction/dart/remove_unnecessary_final.dart';
+import 'package:analysis_server/src/services/correction/dart/remove_unnecessary_inner_casts.dart';
 import 'package:analysis_server/src/services/correction/dart/remove_unnecessary_late.dart';
 import 'package:analysis_server/src/services/correction/dart/remove_unnecessary_library_directive.dart';
 import 'package:analysis_server/src/services/correction/dart/remove_unnecessary_new.dart';
@@ -1790,6 +1791,7 @@ final _builtInNonLintProducers = <ErrorCode, List<ProducerGenerator>>{
   ],
   WarningCode.UNNECESSARY_CAST: [
     RemoveUnnecessaryCast.new,
+    RemoveUnnecessaryInnerCasts.new,
   ],
   WarningCode.UNNECESSARY_FINAL: [
     RemoveUnnecessaryFinal.new,

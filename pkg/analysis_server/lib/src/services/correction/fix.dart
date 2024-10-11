@@ -1397,10 +1397,20 @@ abstract final class DartFixKind {
     DartFixKindPriority.standard,
     'Remove unnecessary cast',
   );
+  static const REMOVE_UNNECESSARY_INNER_CASTS = FixKind(
+    'dart.fix.remove.unnecessaryInnerCasts',
+    DartFixKindPriority.standard,
+    'Remove unnecessary inner casts',
+  );
   static const REMOVE_UNNECESSARY_CAST_MULTI = FixKind(
     'dart.fix.remove.unnecessaryCast.multi',
     DartFixKindPriority.inFile,
     'Remove all unnecessary casts in file',
+  );
+  static const REMOVE_UNNECESSARY_INNER_CASTS_MULTI = FixKind(
+    'dart.fix.remove.unnecessaryInnerCasts.multi',
+    DartFixKindPriority.inFile,
+    'Remove all unnecessary inner casts in file',
   );
   static const REMOVE_UNNECESSARY_FINAL = FixKind(
     'dart.fix.remove.unnecessaryFinal',
