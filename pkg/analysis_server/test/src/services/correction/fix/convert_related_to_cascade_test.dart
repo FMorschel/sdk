@@ -3,8 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:analysis_server/src/services/correction/fix.dart';
-import 'package:analyzer/error/error.dart';
-import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:linter/src/lint_names.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
@@ -24,24 +22,6 @@ class ConvertRelatedToCascadeTest extends FixProcessorLintTest {
 
   @override
   String get lintCode => LintNames.cascade_invocations;
-
-  bool Function(AnalysisError) get _firstError {
-    var hasError = false;
-    return (error) {
-      if (!hasError && error.errorCode.name == LintNames.cascade_invocations) {
-        hasError = true;
-        return true;
-      }
-      return false;
-    };
-  }
-
-  bool Function(AnalysisError) errorFilterLine(int line) {
-    return (error) {
-      var lineInfo = LineInfo.fromContent(error.source.contents.data);
-      return lineInfo.getLocation(error.offset).lineNumber == line;
-    };
-  }
 
   Future<void> test_declaration_method_method() async {
     await resolveTestCode('''
@@ -63,7 +43,7 @@ void f() {
   ..m()
   ..m();
 }
-''', errorFilter: _firstError);
+''', errorFilter: (error) => error.offset == 61);
   }
 
   Future<void> test_method_method_property() async {
@@ -88,7 +68,7 @@ void f(A a) {
   ..m()
   ..x = 1;
 }
-''', errorFilter: _firstError);
+''', errorFilter: (error) => error.offset == 67);
   }
 
   Future<void> test_multipleDeclaration_first_method() async {
@@ -141,7 +121,7 @@ void f(A a) {
   ..m()
   ..m();
 }
-''', errorFilter: _firstError);
+''', errorFilter: (error) => error.offset == 71);
   }
 
   Future<void> test_property_property_method_method() async {
@@ -170,7 +150,7 @@ void f(A a) {
   ..m()
   ..m();
 }
-''', errorFilter: errorFilterLine(9));
+''', errorFilter: (error) => error.offset == 83);
     await assertHasFix('''
 class A {
   void m() {}
@@ -183,7 +163,7 @@ void f(A a) {
   ..m()
   ..m();
 }
-''', errorFilter: errorFilterLine(10));
+''', errorFilter: (error) => error.offset == 93);
   }
 
   Future<void> test_property_property_property() async {
@@ -208,6 +188,6 @@ void f(A a) {
   ..x = 2
   ..x = 3;
 }
-''', errorFilter: _firstError);
+''', errorFilter: (error) => error.offset == 69);
   }
 }
