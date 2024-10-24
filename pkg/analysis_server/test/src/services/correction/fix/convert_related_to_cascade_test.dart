@@ -43,7 +43,7 @@ void f() {
   ..m()
   ..m();
 }
-''', errorFilter: (error) => error.offset == 61);
+''', errorFilter: (error) => error.offset == 56);
   }
 
   Future<void> test_method_method_property() async {
@@ -68,7 +68,7 @@ void f(A a) {
   ..m()
   ..x = 1;
 }
-''', errorFilter: (error) => error.offset == 67);
+''', errorFilter: (error) => error.offset == 61);
   }
 
   Future<void> test_multipleDeclaration_first_method() async {
@@ -121,7 +121,7 @@ void f(A a) {
   ..m()
   ..m();
 }
-''', errorFilter: (error) => error.offset == 71);
+''', errorFilter: (error) => error.offset == 64);
   }
 
   Future<void> test_property_property_method_method() async {
@@ -150,7 +150,7 @@ void f(A a) {
   ..m()
   ..m();
 }
-''', errorFilter: (error) => error.offset == 83);
+''', errorFilter: (error) => error.offset == 75);
     await assertHasFix('''
 class A {
   void m() {}
@@ -163,7 +163,7 @@ void f(A a) {
   ..m()
   ..m();
 }
-''', errorFilter: (error) => error.offset == 93);
+''', errorFilter: (error) => error.offset == 84);
   }
 
   Future<void> test_property_property_property() async {
@@ -188,6 +188,6 @@ void f(A a) {
   ..x = 2
   ..x = 3;
 }
-''', errorFilter: (error) => error.offset == 69);
+''', errorFilter: (error) => error.offset == 63);
   }
 }
