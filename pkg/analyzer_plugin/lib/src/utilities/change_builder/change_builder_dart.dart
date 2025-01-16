@@ -1646,41 +1646,11 @@ class DartFileEditBuilderImpl extends FileEditBuilderImpl
         in resolvedUnit.libraryElement2.firstFragment.libraryImports2) {
       var importedLibrary = import.importedLibrary2;
       if (importedLibrary != null && importedLibrary.uri == uri) {
-        if (showName != null) {
-          final show =
-              import.combinators.whereType<ShowElementCombinator>().firstOrNull;
-          if (show != null) {
-            var names = show.shownNames.toList();
-            if (!names.contains(showName)) {
-              names.add(showName);
-              names.sort();
-              addSimpleReplacement(
-                range.startOffsetEndOffset(show.offset, show.end),
-                'show ${names.join(', ')}',
-              );
-            }
-          }
-          final hide =
-              import.combinators.whereType<HideElementCombinator>().firstOrNull;
-          if (hide != null) {
-            var names = hide.hiddenNames.toList();
-            if (names.contains(showName)) {
-              names.remove(showName);
-              if (names.isEmpty) {
-                addSimpleReplacement(
-                  range.startOffsetEndOffset(hide.offset - 1, hide.end),
-                  '',
-                );
-              } else {
-                addSimpleReplacement(
-                  range.startOffsetEndOffset(hide.offset, hide.end),
-                  'hide ${names.join(', ')}',
-                );
-              }
-            }
-          }
+        var importPrefix = import.prefix2?.element.name3;
+        if (showName != null && importPrefix == null) {
+          _handleCombinators(import, showName);
+          return ImportLibraryElementResultImpl(importPrefix);
         }
-        return ImportLibraryElementResultImpl(import.prefix2?.element.name3);
       }
     }
 
@@ -2322,6 +2292,41 @@ class DartFileEditBuilderImpl extends FileEditBuilderImpl
       }
     }
     return uri.toString();
+  }
+
+  void _handleCombinators(LibraryImport import, String showName) {
+    final show =
+        import.combinators.whereType<ShowElementCombinator>().firstOrNull;
+    if (show != null) {
+      var names = show.shownNames.toList();
+      if (!names.contains(showName)) {
+        names.add(showName);
+        names.sort();
+        addSimpleReplacement(
+          range.startOffsetEndOffset(show.offset, show.end),
+          'show ${names.join(', ')}',
+        );
+      }
+    }
+    final hide =
+        import.combinators.whereType<HideElementCombinator>().firstOrNull;
+    if (hide != null) {
+      var names = hide.hiddenNames.toList();
+      if (names.contains(showName)) {
+        names.remove(showName);
+        if (names.isEmpty) {
+          addSimpleReplacement(
+            range.startOffsetEndOffset(hide.offset - 1, hide.end),
+            '',
+          );
+        } else {
+          addSimpleReplacement(
+            range.startOffsetEndOffset(hide.offset, hide.end),
+            'hide ${names.join(', ')}',
+          );
+        }
+      }
+    }
   }
 
   /// Arranges to have an import added for the library with the given [uri].
