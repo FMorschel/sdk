@@ -3581,93 +3581,28 @@ void f() {
     expect(res.isIncomplete, isTrue);
   }
 
-  Future<void> test_unimportedSymbols_libraryImported_showingOther() async {
+  Future<void> test_unimportedSymbols_libraryImported_hidingMultiple() async {
     newFile(join(projectFolderPath, 'lib', 'my_classes.dart'), '''
 class MyClass1 {}
 class MyClass2 {}
+class MyClass3 {}
 ''');
 
     var content = '''
-import 'package:test/my_classes.dart' show MyClass2;
+import 'package:test/my_classes.dart' hide MyClass1, MyClass2;
 void f() {
   MyClas^
 }
 ''';
 
     var expectedContent = '''
-import 'package:test/my_classes.dart' show MyClass1, MyClass2;
+import 'package:test/my_classes.dart' hide MyClass2;
 void f() {
   MyClass1
 }
 ''';
 
     var completionLabel = 'MyClass1';
-
-    await _checkCompletionEdits(
-      mainFileUri,
-      content,
-      completionLabel,
-      expectedContent,
-    );
-  }
-
-  @soloTest
-  // Code completion doesn't include prefixes for auto-imports so when an
-  // auto-import is added it must be unprefixed even if the library exists with
-  // a prefix (we cannot modify the inserted text during resolve).
-  Future<void> test_unimportedSymbols_libraryImported_withPrefix1() async {
-    newFile(join(projectFolderPath, 'lib', 'my_classes.dart'), '''
-class MyClass1 {}
-class MyClass2 {}
-''');
-
-    var content = '''
-import 'package:test/my_classes.dart' as p1 show MyClass2;
-void f() {
-  MyClas^
-}
-''';
-
-    var expectedContent = '''
-import 'package:test/my_classes.dart' as p1 show MyClass2;
-import 'package:test/my_classes.dart';
-void f() {
-  MyClass1
-}
-''';
-
-    var completionLabel = 'MyClass1';
-
-    await _checkCompletionEdits(
-      mainFileUri,
-      content,
-      completionLabel,
-      expectedContent,
-    );
-  }
-
-  @soloTest
-  Future<void> test_unimportedSymbols_libraryImported_withPrefix2() async {
-    newFile(join(projectFolderPath, 'lib', 'my_classes.dart'), '''
-class MyClass1 {}
-class MyClass2 {}
-''');
-
-    var content = '''
-import 'package:test/my_classes.dart' as p1 show MyClass2;
-void f() {
-  p1.MyClas^
-}
-''';
-
-    var expectedContent = '''
-import 'package:test/my_classes.dart' as p1 show MyClass1, MyClass2;
-void f() {
-  p1.MyClass1
-}
-''';
-
-    var completionLabel = 'p1.MyClass1';
 
     await _checkCompletionEdits(
       mainFileUri,
@@ -3707,22 +3642,55 @@ void f() {
     );
   }
 
-  Future<void> test_unimportedSymbols_libraryImported_hidingMultiple() async {
+  Future<void> test_unimportedSymbols_libraryImported_showingOther() async {
     newFile(join(projectFolderPath, 'lib', 'my_classes.dart'), '''
 class MyClass1 {}
 class MyClass2 {}
-class MyClass3 {}
 ''');
 
     var content = '''
-import 'package:test/my_classes.dart' hide MyClass1, MyClass2;
+import 'package:test/my_classes.dart' show MyClass2;
 void f() {
   MyClas^
 }
 ''';
 
     var expectedContent = '''
-import 'package:test/my_classes.dart' hide MyClass2;
+import 'package:test/my_classes.dart' show MyClass1, MyClass2;
+void f() {
+  MyClass1
+}
+''';
+
+    var completionLabel = 'MyClass1';
+
+    await _checkCompletionEdits(
+      mainFileUri,
+      content,
+      completionLabel,
+      expectedContent,
+    );
+  }
+
+  // Code completion doesn't include prefixes for auto-imports so when an
+  // auto-import is added it must be unprefixed even if the library exists with
+  // a prefix (we cannot modify the inserted text during resolve).
+  Future<void> test_unimportedSymbols_libraryImported_withPrefix() async {
+    newFile(join(projectFolderPath, 'lib', 'my_classes.dart'), '''
+class MyClass1 {}
+class MyClass2 {}
+''');
+
+    var content = '''
+import 'package:test/my_classes.dart' as p1 show MyClass2;
+void f() {
+  MyClas^
+}
+''';
+
+    var expectedContent = '''
+import 'package:test/my_classes.dart' as p1 show MyClass2;
+import 'package:test/my_classes.dart';
 void f() {
   MyClass1
 }
