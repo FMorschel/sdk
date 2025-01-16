@@ -449,7 +449,12 @@ abstract class DartFileEditBuilder implements FileEditBuilder {
   /// import prefix of the existing import directive.
   ///
   /// If there is no existing import, a new import is added.
-  ImportLibraryElementResult importLibraryElement(Uri uri);
+  ImportLibraryElementResult importLibraryElement(
+    Uri uri, {
+    String? prefix,
+    String? showName,
+    bool useShow = false,
+  });
 
   /// Returns whether the given library [uri] is already imported or will be
   /// imported by a scheduled edit.
