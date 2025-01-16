@@ -2294,6 +2294,13 @@ class DartFileEditBuilderImpl extends FileEditBuilderImpl
     return uri.toString();
   }
 
+  /// If the [import] already has a combinator, update it to import [showName].
+  ///
+  /// If the combinator is a `show`, then [showName] will be added to the list
+  /// of shown names.
+  ///
+  /// If the combinator is a `hide`, then [showName] will be removed from the
+  /// list of hidden names.
   void _handleCombinators(LibraryImport import, String showName) {
     final show =
         import.combinators.whereType<ShowElementCombinator>().firstOrNull;
