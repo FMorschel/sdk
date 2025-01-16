@@ -3615,7 +3615,7 @@ void f() {
   // Code completion doesn't include prefixes for auto-imports so when an
   // auto-import is added it must be unprefixed even if the library exists with
   // a prefix (we cannot modify the inserted text during resolve).
-  Future<void> test_unimportedSymbols_libraryImported_withPrefix() async {
+  Future<void> test_unimportedSymbols_libraryImported_withPrefix1() async {
     newFile(join(projectFolderPath, 'lib', 'my_classes.dart'), '''
 class MyClass1 {}
 class MyClass2 {}
@@ -3637,6 +3637,37 @@ void f() {
 ''';
 
     var completionLabel = 'MyClass1';
+
+    await _checkCompletionEdits(
+      mainFileUri,
+      content,
+      completionLabel,
+      expectedContent,
+    );
+  }
+
+  @soloTest
+  Future<void> test_unimportedSymbols_libraryImported_withPrefix2() async {
+    newFile(join(projectFolderPath, 'lib', 'my_classes.dart'), '''
+class MyClass1 {}
+class MyClass2 {}
+''');
+
+    var content = '''
+import 'package:test/my_classes.dart' as p1 show MyClass2;
+void f() {
+  p1.MyClas^
+}
+''';
+
+    var expectedContent = '''
+import 'package:test/my_classes.dart' as p1 show MyClass1, MyClass2;
+void f() {
+  p1.MyClass1
+}
+''';
+
+    var completionLabel = 'p1.MyClass1';
 
     await _checkCompletionEdits(
       mainFileUri,
