@@ -620,7 +620,7 @@ class _ImportAbsoluteLibrary extends ResolvedCorrectionProducer {
         _uriText = builder.importLibraryWithAbsoluteUri(
           _library,
           prefix: _prefix,
-          shownName: _show,
+          showName: _show,
           useShow: _show != null,
         );
       }
@@ -866,7 +866,7 @@ class _ImportRelativeLibrary extends ResolvedCorrectionProducer {
         _uriText = builder.importLibraryWithRelativeUri(
           _library,
           prefix: _prefix,
-          shownName: _show,
+          showName: _show,
           useShow: _show != null,
         );
       }
