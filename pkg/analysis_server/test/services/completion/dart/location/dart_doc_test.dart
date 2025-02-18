@@ -92,11 +92,31 @@ suggestions
 ''');
   }
 
-  Future<void> test_field() async {
+  Future<void> test_field1() async {
     allowedIdentifiers = const {'myField'};
     await computeSuggestions('''
 class MyClass1 {
   /// This doc should suggest the commented field name [myF^].
+  int myField = 0;
+}
+''');
+    assertResponse(r'''
+replacement
+  left: 3
+suggestions
+  myField
+    kind: field
+''');
+  }
+
+  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/59724')
+  Future<void> test_field2() async {
+    allowedIdentifiers = const {'myField'};
+    await computeSuggestions('''
+/// This is unrelated but should suggest name [MyClass1.myF^].
+var myVariable = 0;
+
+class MyClass1 {
   int myField = 0;
 }
 ''');
