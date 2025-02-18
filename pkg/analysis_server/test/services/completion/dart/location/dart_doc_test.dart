@@ -161,23 +161,21 @@ suggestions
 ''');
   }
 
-  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/59724')
   Future<void> test_importPrefix() async {
-    allowedIdentifiers = const {'myPrefix'};
+    allowedIdentifiers = const {'async'};
     await computeSuggestions('''
-/// This doc should suggest the commented import prefix name [myP^].
-import 'dart:async' as myPrefix;
+/// This doc should suggest the commented import prefix name [asy^].
+import 'dart:async' as async;
 ''');
     assertResponse(r'''
 replacement
   left: 3
 suggestions
-  myPrefix
-    kind: importPrefix
+  async
+    kind: library
 ''');
   }
 
-  @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/59724')
   Future<void> test_library() async {
     allowedIdentifiers = const {'MyClass1'};
     await computeSuggestions('''
