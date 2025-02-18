@@ -235,7 +235,7 @@ class CompletionGetSuggestions2Handler extends CompletionHandler
           notImportedSuggestions.isIncomplete ||
           lengthRestricted.length < suggestionBuilders.length;
 
-      performance.run('sendResponse', (p) {
+      performance.run('sendResponse', (_) {
         sendResult(
           CompletionGetSuggestions2Result(
             completionRequest.replacementOffset,
