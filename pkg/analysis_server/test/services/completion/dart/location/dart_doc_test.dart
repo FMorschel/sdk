@@ -61,6 +61,21 @@ suggestions
 ''');
   }
 
+  Future<void> test_enum() async {
+    allowedIdentifiers = const {'MyEnum'};
+    await computeSuggestions('''
+/// This doc should suggest the commented enum name [MyE^].
+enum MyEnum { value1 }
+''');
+    assertResponse(r'''
+replacement
+  left: 3
+suggestions
+  MyEnum
+    kind: enum
+''');
+  }
+
   @FailingTest(issue: 'https://github.com/dart-lang/sdk/issues/59724')
   Future<void> test_extension() async {
     allowedIdentifiers = const {'MyExt'};
