@@ -2256,12 +2256,20 @@ class InScopeCompletionPass extends SimpleAstVisitor<void> {
               mustBeAssignable: mustBeAssignable,
             ).addDeclarationsThroughImportPrefix(element);
           } else {
-            declarationHelper(
+            var helper = declarationHelper(
               mustBeAssignable: mustBeAssignable,
               preferNonInvocation:
                   element is InterfaceElement2 &&
                   state.request.shouldSuggestTearOff2(element),
-            ).addStaticMembersOfElement(element);
+            );
+            if (node.parent is CommentReference) {
+              if (element is InterfaceElement2) {
+                helper.addInstanceMembersOfType(element.thisType);
+              } else if (element is ExtensionElement2) {
+                helper.addMembersFromExtensionElement(element);
+              }
+            }
+            helper.addStaticMembersOfElement(element);
           }
         }
       }
