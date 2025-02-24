@@ -15,12 +15,15 @@ import 'package:analyzer/src/generated/java_core.dart';
 /// A [Refactoring] for renaming [FormalParameterElement]s.
 class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
   List<FormalParameterElement> elements = [];
+  bool _renameAllPositionalOccurences;
 
   RenameParameterRefactoringImpl(
     super.workspace,
     super.sessionHelper,
-    FormalParameterElement super.element,
-  ) : super();
+    FormalParameterElement super.element, {
+    bool renameAllPositionalOccurences = false,
+  }) : _renameAllPositionalOccurences = renameAllPositionalOccurences,
+       super();
 
   @override
   FormalParameterElement get element => super.element as FormalParameterElement;
@@ -45,6 +48,14 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
         break;
       }
       var resolvedUnit = await sessionHelper.getResolvedUnitByElement(element);
+      if (resolvedUnit != null && !_renameAllPositionalOccurences) {
+        // If any of the resolved units have the lint enabled, we should avoid
+        // renaming method parameters separately from the other implementations.
+        _renameAllPositionalOccurences |=
+            getCodeStyleOptions(
+              resolvedUnit.file,
+            ).avoidRenamingMethodParameters;
+      }
       var unit = resolvedUnit?.unit;
       unit?.accept(
         ConflictValidatorVisitor(
@@ -94,6 +105,19 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
         references.removeWhere(
           (match) => match.element is SuperFormalParameterElement2,
         );
+        var method = element.enclosingElement2;
+        if (method is MethodElement2) {
+          var index = method.parameterIndex(element);
+          var methods =
+              (await getHierarchyMembers(searchEngine, method))
+                  .where((element) => element != method)
+                  .whereType<MethodElement2>();
+          if (index != null) {
+            for (var method in methods) {
+              await _renameParametersInMethodOccurences(method, index);
+            }
+          }
+        }
       }
 
       processor.addReferenceEdits(references);
@@ -109,5 +133,42 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
     } else {
       elements = [element];
     }
+  }
+
+  Future<void> _renameParametersInMethodOccurences(
+    MethodElement2 method,
+    int index,
+  ) async {
+    if (!_renameAllPositionalOccurences) {
+      return;
+    }
+    var parameter = method.formalParameters[index];
+    if (parameter.name3 == newName) {
+      return;
+    }
+    var refactorOther = RenameParameterRefactoringImpl(
+      workspace,
+      sessionHelper,
+      parameter,
+      renameAllPositionalOccurences: true,
+    );
+    refactorOther.newName = newName;
+    await refactorOther.checkInitialConditions();
+    refactorOther.checkNewName();
+    await refactorOther.checkFinalConditions();
+    await refactorOther.fillChange();
+  }
+}
+
+extension on MethodElement2 {
+  int? parameterIndex(FormalParameterElement parameter) {
+    var index = 0;
+    for (var p in formalParameters) {
+      if (p == parameter) {
+        return index;
+      }
+      index++;
+    }
+    return null;
   }
 }
