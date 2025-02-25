@@ -14,6 +14,8 @@ import 'package:analyzer/src/generated/java_core.dart';
 
 /// A [Refactoring] for renaming [FormalParameterElement]s.
 class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
+  final bool _lookForHierarchy;
+
   List<FormalParameterElement> elements = [];
   bool _renameAllPositionalOccurences;
 
@@ -22,7 +24,9 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
     super.sessionHelper,
     FormalParameterElement super.element, {
     bool renameAllPositionalOccurences = false,
-  }) : _renameAllPositionalOccurences = renameAllPositionalOccurences,
+    bool lookForHierarchy = true,
+  }) : _lookForHierarchy = lookForHierarchy,
+       _renameAllPositionalOccurences = renameAllPositionalOccurences,
        super();
 
   @override
@@ -48,23 +52,26 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
         break;
       }
       var resolvedUnit = await sessionHelper.getResolvedUnitByElement(element);
-      if (resolvedUnit != null && !_renameAllPositionalOccurences) {
+      if (resolvedUnit != null) {
         // If any of the resolved units have the lint enabled, we should avoid
         // renaming method parameters separately from the other implementations.
-        _renameAllPositionalOccurences |=
-            getCodeStyleOptions(
-              resolvedUnit.file,
-            ).avoidRenamingMethodParameters;
+        if (!_renameAllPositionalOccurences) {
+          _renameAllPositionalOccurences |=
+              getCodeStyleOptions(
+                resolvedUnit.file,
+              ).avoidRenamingMethodParameters;
+        }
+
+        var unit = resolvedUnit.unit;
+        unit.accept(
+          ConflictValidatorVisitor(
+            result,
+            newName,
+            element,
+            VisibleRangesComputer.forNode(unit),
+          ),
+        );
       }
-      var unit = resolvedUnit?.unit;
-      unit?.accept(
-        ConflictValidatorVisitor(
-          result,
-          newName,
-          element,
-          VisibleRangesComputer.forNode(unit),
-        ),
-      );
     }
     return result;
   }
@@ -106,16 +113,14 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
           (match) => match.element is SuperFormalParameterElement2,
         );
         var method = element.enclosingElement2;
-        if (method is MethodElement2) {
+        if (method is MethodElement2 && _lookForHierarchy) {
           var index = method.parameterIndex(element);
           var methods =
               (await getHierarchyMembers(searchEngine, method))
                   .where((element) => element != method)
                   .whereType<MethodElement2>();
-          if (index != null) {
-            for (var method in methods) {
-              await _renameParametersInMethodOccurences(method, index);
-            }
+          for (var method in methods) {
+            await _renameParametersInMethodOccurences(method, index);
           }
         }
       }
@@ -137,8 +142,11 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
 
   Future<void> _renameParametersInMethodOccurences(
     MethodElement2 method,
-    int index,
+    int? index,
   ) async {
+    if (index == null) {
+      return;
+    }
     if (!_renameAllPositionalOccurences) {
       return;
     }
@@ -151,12 +159,9 @@ class RenameParameterRefactoringImpl extends RenameRefactoringImpl {
       sessionHelper,
       parameter,
       renameAllPositionalOccurences: true,
+      lookForHierarchy: false,
     );
     refactorOther.newName = newName;
-    await refactorOther.checkInitialConditions();
-    refactorOther.checkNewName();
-    await refactorOther.checkFinalConditions();
-    await refactorOther.fillChange();
   }
 }
 
