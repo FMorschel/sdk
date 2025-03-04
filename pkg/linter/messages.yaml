@@ -2242,6 +2242,49 @@ LintCode:
         if (file.lastModifiedSync().isBefore(now)) print('before'); // OK
       }
       ```
+  avoid_switch_on_runtimeType:
+    problemMessage: "Prefer using pattern matching over 'switch' on 'runtimeType'."
+    correctionMessage: "Try using a pattern match instead."
+    state:
+      stable: "3.0"
+    categories: [unintentional, style]
+    hasPublishedDocs: false
+    documentation: |-
+      #### Description
+
+      The analyzer produces this diagnostic when a `switch` statement is used
+      on the value of `runtimeType`.
+
+      #### Example
+
+      The following code produces this diagnostic because the `switch` statement
+      is used on the value of `runtimeType`:
+
+      ```dart
+      void f(Object o) {
+        switch (o.runtimeType) {
+          case const (int):
+            print('int');
+          case const (String):
+            print('String');
+        }
+      }
+      ```
+
+      #### Common fixes
+
+      Use a pattern match instead:
+
+      ```dart
+      void f(Object o) {
+        switch (o) {
+          case int():
+            print('int');
+          case String():
+            print('String');
+        }
+      }
+      ```
   avoid_type_to_string:
     problemMessage: "Using 'toString' on a 'Type' is not safe in production code."
     correctionMessage: "Try a normal type check or compare the 'runtimeType' directly."
