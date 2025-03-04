@@ -125,6 +125,9 @@ abstract final class LintNames {
 
   static const String avoid_slow_async_io = 'avoid_slow_async_io';
 
+  static const String avoid_switch_on_runtimetype =
+      'avoid_switch_on_runtimetype';
+
   static const String avoid_type_to_string = 'avoid_type_to_string';
 
   static const String avoid_types_as_parameter_names =

@@ -50,6 +50,7 @@ import 'rules/avoid_setters_without_getters.dart';
 import 'rules/avoid_shadowing_type_parameters.dart';
 import 'rules/avoid_single_cascade_in_expression_statements.dart';
 import 'rules/avoid_slow_async_io.dart';
+import 'rules/avoid_switch_on_runtimetype.dart';
 import 'rules/avoid_type_to_string.dart';
 import 'rules/avoid_types_as_parameter_names.dart';
 import 'rules/avoid_types_on_closure_parameters.dart';
@@ -270,6 +271,7 @@ void registerLintRules() {
     ..registerLintRule(AvoidAnnotatingWithDynamic())
     ..registerLintRule(AvoidAs())
     ..registerLintRule(AvoidBoolLiteralsInConditionalExpressions())
+    ..registerLintRule(AvoidSwitchOnRuntimeType())
     ..registerLintRule(AvoidCatchesWithoutOnClauses())
     ..registerLintRule(AvoidCatchingErrors())
     ..registerLintRule(AvoidClassesWithOnlyStaticMembers())

@@ -2242,18 +2242,20 @@ LintCode:
         if (file.lastModifiedSync().isBefore(now)) print('before'); // OK
       }
       ```
-  avoid_switch_on_runtimeType:
-    problemMessage: "Prefer using pattern matching over 'switch' on 'runtimeType'."
-    correctionMessage: "Try using a pattern match instead."
+  avoid_switch_on_runtimetype:
+    problemMessage: "Avoid switch cases on 'runtimeType'."
+    correctionMessage: "Prefer to use pattern matching instead."
     state:
       stable: "3.0"
-    categories: [unintentional, style]
+    categories: [unintentional, style, languageFeatureUsage]
     hasPublishedDocs: false
     documentation: |-
       #### Description
 
       The analyzer produces this diagnostic when a `switch` statement is used
-      on the value of `runtimeType`.
+      on the value of `runtimeType`. This is not type-safe and can lead to
+      bugs if the class hierarchy changes. Prefer to use pattern matching
+      instead.
 
       #### Example
 
@@ -2273,7 +2275,7 @@ LintCode:
 
       #### Common fixes
 
-      Use a pattern match instead:
+      Use pattern matching instead:
 
       ```dart
       void f(Object o) {
@@ -2282,6 +2284,34 @@ LintCode:
             print('int');
           case String():
             print('String');
+        }
+      }
+      ```
+    deprecatedDetails: |-
+      **AVOID** using `switch` on `runtimeType`.
+
+      Switching on `runtimeType` is not type-safe and can lead to bugs if the
+      class hierarchy changes. Prefer to use pattern matching instead.
+
+      **BAD:**
+      ```dart
+      void f(Object o) {
+        switch (o.runtimeType) {
+          case int:
+            print('int');
+          case String:
+            print('String');
+        }
+      }
+      ```
+
+      **GOOD:**
+      ```dart
+      void f(Object o) {
+        if (o is int) {
+          print('int');
+        } else if (o is String) {
+          print('String');
         }
       }
       ```

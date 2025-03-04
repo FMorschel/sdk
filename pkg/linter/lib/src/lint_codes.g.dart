@@ -351,6 +351,12 @@ class LinterLintCode extends LintCode {
     hasPublishedDocs: true,
   );
 
+  static const LintCode avoid_switch_on_runtimetype = LinterLintCode(
+    LintNames.avoid_switch_on_runtimetype,
+    "Avoid switch cases on 'runtimeType'.",
+    correctionMessage: "Prefer to use pattern matching instead.",
+  );
+
   static const LintCode avoid_type_to_string = LinterLintCode(
     LintNames.avoid_type_to_string,
     "Using 'toString' on a 'Type' is not safe in production code.",

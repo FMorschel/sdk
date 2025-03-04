@@ -69,6 +69,7 @@ import 'avoid_shadowing_type_parameters_test.dart'
 import 'avoid_single_cascade_in_expression_statements_test.dart'
     as avoid_single_cascade_in_expression_statements;
 import 'avoid_slow_async_io_test.dart' as avoid_slow_async_io;
+import 'avoid_switch_on_runtimetype_test.dart' as avoid_switch_on_runtimetype;
 import 'avoid_type_to_string_test.dart' as avoid_type_to_string;
 import 'avoid_types_as_parameter_names_test.dart'
     as avoid_types_as_parameter_names;
@@ -371,6 +372,7 @@ void main() {
   avoid_shadowing_type_parameters.main();
   avoid_single_cascade_in_expression_statements.main();
   avoid_slow_async_io.main();
+  avoid_switch_on_runtimetype.main();
   avoid_type_to_string.main();
   avoid_types_as_parameter_names.main();
   avoid_types_on_closure_parameters.main();
