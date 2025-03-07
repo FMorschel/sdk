@@ -46,6 +46,11 @@ class DartAssistContextImpl implements DartAssistContext {
 
 /// An enumeration of possible assist kinds.
 abstract final class DartAssistKind {
+  static const TMP = AssistKind(
+    'dart.assist.tmp',
+    DartAssistKindPriority.DEFAULT,
+    '',
+  );
   static const ADD_DIAGNOSTIC_PROPERTY_REFERENCE = AssistKind(
     'dart.assist.add.diagnosticPropertyReference',
     DartAssistKindPriority.DEFAULT,
