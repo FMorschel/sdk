@@ -153,20 +153,21 @@ class _MergeCombinators extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     LibraryElement2? element;
-    LibraryImport? library;
+    LibraryImport? import;
+    LibraryExport? export;
     switch (directive) {
       case ExportDirective(:var libraryExport):
         break;
       case ImportDirective(:var libraryImport):
-        library = libraryImport;
+        import = libraryImport;
         element = libraryImport?.importedLibrary2;
     }
-    if (library == null || element is! LibraryElementImpl) {
+    if (import == null || element is! LibraryElementImpl) {
       return;
     }
 
     if (mergeWithShow) {
-      var namespace = getImportNamespace(library);
+      var namespace = getImportNamespace(import);
       // prepare names of referenced elements (from this import)
       var visitor = _ReferenceFinder(namespace);
       unit.accept(visitor);
@@ -188,7 +189,7 @@ class _MergeCombinators extends ResolvedCorrectionProducer {
     var originalNamespace = namespaceBuilder.createExportNamespaceForLibrary(
       element,
     );
-    var hiddenNames = originalNamespace.hiddenNames(library.namespace);
+    var hiddenNames = originalNamespace.hiddenNames(import.namespace);
     await builder.addDartFileEdit(file, (builder) {
       var showCombinator = '';
       if (hiddenNames.isNotEmpty) {
