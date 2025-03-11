@@ -43,9 +43,7 @@ abstract class BaseFixProcessorTest extends AbstractSingleUnitTest {
   /// using the [errorFilter] to filter out errors that should be ignored, and
   /// expecting that there is a single remaining error. The error filter should
   /// return `true` if the error should not be ignored.
-  Future<AnalysisError> _findErrorToFix({
-    ErrorFilter? errorFilter,
-  }) async {
+  Future<AnalysisError> _findErrorToFix({ErrorFilter? errorFilter}) async {
     var errors = testAnalysisResult.errors;
     if (errorFilter != null) {
       if (errors.length == 1) {
@@ -219,9 +217,7 @@ abstract class FixInFileProcessorTest extends BaseFixProcessorTest {
     expect(resultCode, expected);
   }
 
-  Future<List<Fix>> getFixesForFirst(
-    ErrorFilter test,
-  ) async {
+  Future<List<Fix>> getFixesForFirst(ErrorFilter test) async {
     var errors = testAnalysisResult.errors.where(test);
     expect(errors, isNotEmpty);
     String? errorCode;
@@ -284,8 +280,8 @@ abstract class FixProcessorErrorCodeTest extends FixProcessorTest {
   ErrorCode get errorCode;
 
   ErrorFilter get errorCodeFilter => (e) {
-      return e.errorCode == errorCode;
-    };
+    return e.errorCode == errorCode;
+  };
 }
 
 /// A base class defining support for writing fix processor tests that are
@@ -401,9 +397,7 @@ abstract class FixProcessorTest extends BaseFixProcessorTest {
     );
   }
 
-  Future<void> assertHasFixWithoutApplying({
-    ErrorFilter? errorFilter,
-  }) async {
+  Future<void> assertHasFixWithoutApplying({ErrorFilter? errorFilter}) async {
     var error = await _findErrorToFix(errorFilter: errorFilter);
     var fix = await _assertHasFix(error);
     change = fix.change;
