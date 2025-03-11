@@ -1091,7 +1091,7 @@ abstract final class DartFixKind {
   /// Used when the user has only `hide` combinators to suggest merging using
   /// `hide`.
   static const MERGE_COMBINATORS_HIDE_HIDE = FixKind(
-    'dart.fix.mergeCombinatorsShow.hide',
+    'dart.fix.mergeCombinatorsHide.hide',
     DartFixKindPriority.standard + 1,
     "Merge combinators into a single 'hide'",
   );
@@ -1099,7 +1099,7 @@ abstract final class DartFixKind {
   /// Used when the user has at least one `show` combinator to suggest merging
   /// using `hide`.
   static const MERGE_COMBINATORS_HIDE_SHOW = FixKind(
-    'dart.fix.mergeCombinatorsShow.show',
+    'dart.fix.mergeCombinatorsHide.show',
     DartFixKindPriority.standard,
     "Merge combinators into a single 'hide'",
   );
