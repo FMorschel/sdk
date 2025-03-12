@@ -92,29 +92,33 @@ class _MergeCombinators extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     LibraryElement2? element;
-    LibraryImport? import;
-    LibraryExport? export;
+    Map<String, Element2> namespace;
+    Namespace? originalNamespace;
     switch (directive) {
-      case ExportDirective(:var libraryExport):
-        break;
-      case ImportDirective(:var libraryImport):
-        import = libraryImport;
-        element = libraryImport?.importedLibrary2;
+      case ExportDirective(:LibraryExportElementImpl libraryExport):
+        element = libraryExport.exportedLibrary2;
+        if (element is! LibraryElementImpl) {
+          return;
+        }
+        originalNamespace = _originalNamespace(element);
+        namespace = _currentNamespace(libraryExport).definedNames2;
+      case ImportDirective(:var libraryImport?):
+        namespace = getImportNamespace(libraryImport);
+        element = libraryImport.importedLibrary2;
+      default:
+        return;
     }
-    if (import == null || element is! LibraryElementImpl) {
+    if (element is! LibraryElementImpl) {
       return;
     }
 
     if (mergeWithShow) {
-      var namespace = getImportNamespace(import);
       var referencedNames = namespace.keys.toList();
       await _buildNewCombinator(builder, Keyword.SHOW, referencedNames);
       return;
     }
 
-    var originalNamespace = namespaceBuilder.createExportNamespaceForLibrary(
-      element,
-    );
+    originalNamespace ??= _originalNamespace(element);
 
     var explicitlyHiddenNames =
         directive.combinators.whereType<HideCombinator>().expand((combinator) {
@@ -127,7 +131,7 @@ class _MergeCombinators extends ResolvedCorrectionProducer {
         {
           ...explicitlyHiddenNames,
           ...originalNamespace.hiddenNames(
-            explicitlyHiddenNames..addAll(import.namespace.definedNames2.keys),
+            explicitlyHiddenNames..addAll(namespace.keys),
           ),
         }.toList();
     await _buildNewCombinator(builder, Keyword.HIDE, hiddenNames);
@@ -152,6 +156,14 @@ class _MergeCombinators extends ResolvedCorrectionProducer {
         combinator,
       );
     });
+  }
+
+  Namespace _currentNamespace(LibraryExportElementImpl libraryExport) {
+    return namespaceBuilder.createExportNamespaceForDirective2(libraryExport);
+  }
+
+  Namespace _originalNamespace(LibraryElementImpl element) {
+    return namespaceBuilder.createExportNamespaceForLibrary(element);
   }
 }
 
