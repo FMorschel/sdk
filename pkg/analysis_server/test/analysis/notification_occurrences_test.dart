@@ -747,6 +747,14 @@ void f() {
     findRegion(offset, 'void'.length, exists: false);
   }
 
+  @soloTest
+  Future<void> test_typedefParameterParameter() async {
+    await assertOccurrences(kind: ElementKind.PARAMETER, '''
+/// Ref [/*[0*/myParameter/*0]*/].
+typedef T = void Function(int /*[1*/myParameter/*1]*/);
+''');
+  }
+
   Future<void> test_typeParameter_class() async {
     await assertOccurrences(kind: ElementKind.TYPE_PARAMETER, '''
 abstract class A</*[0*/ThisType/*0]*/> {

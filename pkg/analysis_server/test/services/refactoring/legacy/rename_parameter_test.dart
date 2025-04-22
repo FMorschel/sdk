@@ -488,6 +488,42 @@ class B extends A {
 ''');
   }
 
+  @soloTest
+  Future<void> test_createChange_typedefParameterParameter1() async {
+    await indexTestUnit('''
+/// Ref [myParameter].
+typedef T = void Function(int myParameter);
+''');
+
+    createRenameRefactoringAtString('myParameter]');
+    expect(refactoring.refactoringName, 'Rename Parameter');
+    expect(refactoring.elementKindName, 'parameter');
+    refactoring.newName = 'newName';
+
+    return assertSuccessfulRefactoring('''
+/// Ref [newName].
+typedef T = void Function(int newName);
+''');
+  }
+
+  @soloTest
+  Future<void> test_createChange_typedefParameterParameter2() async {
+    await indexTestUnit('''
+/// Ref [myParameter].
+typedef T = void Function(int myParameter);
+''');
+
+    createRenameRefactoringAtString('myParameter)');
+    expect(refactoring.refactoringName, 'Rename Parameter');
+    expect(refactoring.elementKindName, 'parameter');
+    refactoring.newName = 'newName';
+
+    return assertSuccessfulRefactoring('''
+/// Ref [newName].
+typedef T = void Function(int newName);
+''');
+  }
+
   Future<void> test_function_shadow() async {
     await indexTestUnit('''
 void function(int a) {
